@@ -1,19 +1,20 @@
 // src/index.ts
 
 import Vue from 'vue'
-import HelloComponent from './components/Hello.vue'
+import Maze from './components/Maze/Maze.vue'
+import store from './components/Maze/store.js'
 
 let v = new Vue({
   el: '#app',
   template: `
     <div>
-        Name: <input v-model="name" type="text">
-        <hello-component :name="name" :initialEnthusiasm="5" />
+        <maze></maze>
     </div>`,
   data: {
     name: 'World'
   },
   components: {
-    HelloComponent
-  }
+    Maze
+  },
+  store
 })
