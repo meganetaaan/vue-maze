@@ -1,0 +1,34 @@
+{
+  "name": "vue-maze",
+  "version": "1.0.0",
+  "description": "Vue-maze ===",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/meganetaaan/vue-maze.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/meganetaaan/vue-maze/issues"
+  },
+  "homepage": "https://github.com/meganetaaan/vue-maze#readme",
+  "dependencies": {
+    "vue": "git+https://github.com/DanielRosenwasser/vue.git#540a38fb21adb7a7bc394c65e23e6cffb36cd867"
+  },
+  "devDependencies": {
+    "css-loader": "^0.28.7",
+    "ts-loader": "^2.3.7",
+    "tslint": "^5.7.0",
+    "tslint-config-standard": "^6.0.1",
+    "typescript": "^2.5.3",
+    "vue-loader": "^13.0.5",
+    "vue-template-compiler": "^2.2.1",
+    "webpack": "^3.6.0"
+  }
+}
