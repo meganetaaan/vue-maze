@@ -4,6 +4,7 @@ class Maze {
   bondH: Array<boolean>
   bondV: Array<boolean>
   point: Array<number>
+  goal: {x: number, y: number}
 
   constructor (lx: number, ly: number, seed: number) {
     const bondHSize = (lx + 1) * ly
@@ -90,6 +91,10 @@ class Maze {
     // open start and goal
     this.bondH[0] = true
     this.bondH[(this.lx + 1) * this.ly - 1] = true
+    this.goal = {
+      x: this.lx - 1,
+      y: this.ly - 1
+    }
     return
   }
 }

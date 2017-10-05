@@ -16,7 +16,11 @@ const store = new Vuex.Store({
     ly: null,
     maze: {
       bondH: [],
-      bondV: []
+      bondV: [],
+      goal: {
+        x: null,
+        y: null
+      }
     },
     player: {
       id: '00',
@@ -34,8 +38,8 @@ const store = new Vuex.Store({
   },
   actions: {
     async movePlayerBy (arg, payload) {
-      const param = { x: this.state.player.x + payload.x, y: this.state.player.y + payload.y }
-      await this.movePlayerTo(arg, param)
+      const param = { x: this.state.player.x + payload.dx, y: this.state.player.y + payload.dy }
+      await this.dispatch('movePlayerTo', param)
     },
     async movePlayerTo ({ commit }, payload) {
       const id = payload.id
@@ -90,6 +94,8 @@ const store = new Vuex.Store({
       for (let i = 0; i < bondVSize; i++) {
         Vue.set(state.maze.bondV, i, payload.maze.bondV[i])
       }
+      state.maze.goal.x = payload.maze.goal.x
+      state.maze.goal.y = payload.maze.goal.y
     },
     setPlayer (state, payload) {
       state.player.x = payload.x

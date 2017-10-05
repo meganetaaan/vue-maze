@@ -77,9 +77,32 @@ export default {
       image: null
     }
   },
+  computed: {
+    ready () {
+      return this.bondH.length > 0 || this.bondV.length > 0
+    },
+    lx () {
+      return Math.max(1, Math.floor((this.width - this.margin * 2) / this.cellWidth))
+    },
+    ly () {
+      return Math.max(1, Math.floor((this.height - this.margin * 2) / this.cellHeight))
+    },
+    bondH () {
+      return this.$store.getters.getBondH()
+    },
+    bondV () {
+      return this.$store.getters.getBondV()
+    },
+    goal () {
+      return this.$store.state.maze.goal
+    },
+    player () {
+      return this.$store.state.player
+    }
+  },
   mounted (vm) {
-    this.height = this.$el.offsetHeight
-    this.width = this.$el.offsetWidth
+    this.height = this.$el.offsetHeight - this.margin
+    this.width = this.$el.offsetWidth - this.margin
     this.renderer = new Renderer(
       this.$refs.mazeCanvas.getContext('2d'),
       this.cellWidth,
@@ -105,26 +128,6 @@ export default {
       this.height = this.$el.offsetHeight
       this.width = this.$el.offsetWidth
     })
-  },
-  computed: {
-    ready () {
-      return this.bondH.length > 0 || this.bondV.length > 0
-    },
-    lx () {
-      return Math.max(1, Math.floor((this.width - this.margin * 2) / this.cellWidth))
-    },
-    ly () {
-      return Math.max(1, Math.floor((this.height - this.margin * 2) / this.cellHeight))
-    },
-    bondH () {
-      return this.$store.getters.getBondH()
-    },
-    bondV () {
-      return this.$store.getters.getBondV()
-    },
-    player () {
-      return this.$store.state.player
-    }
   },
   watch: {
     lx () {
@@ -176,7 +179,7 @@ export default {
       const dy = this.player.y - y
       if (Math.abs(dx * dy) <= 1) {
         console.log()
-        this.moveTo(x, y)
+        this.moveBy(dx, dy)
       }
     },
     onKeyUp (event) {
@@ -195,19 +198,19 @@ export default {
       }
     },
     goUp () {
-      this.moveTo(this.player.x, this.player.y - 1)
+      this.moveBy(0, -1)
     },
     goDown () {
-      this.moveTo(this.player.x, this.player.y + 1)
+      this.moveBy(0, 1)
     },
     goLeft () {
-      this.moveTo(this.player.x - 1, this.player.y)
+      this.moveBy(-1, 0)
     },
     goRight () {
-      this.moveTo(this.player.x + 1, this.player.y)
+      this.moveBy(1, 0)
     },
-    moveTo (x, y) {
-      this.$store.dispatch('movePlayerTo', {x, y})
+    moveBy (dx, dy) {
+      this.$store.dispatch('movePlayerBy', {dx, dy})
     },
     updateMaze: _.debounce(function () {
       if (this.lx > 0 && this.ly > 0) {
@@ -217,7 +220,7 @@ export default {
         })
       }
     }, 300),
-    renderPlayer: function () {
+    renderPlayer () {
       const {playerRenderer, player} = this
       playerRenderer.clear(this.width, this.height)
       playerRenderer.ctx = this.$refs.playerCanvas.getContext('2d')
@@ -228,18 +231,20 @@ export default {
         playerRenderer.drawCircle(player.x, player.y)
       }
     },
+    renderGoal () {
+      const {renderer} = this
+      renderer.ctx = this.$refs.mazeCanvas.getContext('2d')
+      renderer.setColor('#4CAF50', '#222')
+      renderer.drawCircle(this.goal.x, this.goal.y)
+    },
     // TODO: make more declarative
     renderMaze: _.debounce(function () {
       const {renderer, lx, ly, bondH, bondV} = this
 
-      this.renderPlayer()
       renderer.clear(this.width, this.height)
-      renderer.ctx = this.$refs.mazeCanvas.getContext('2d')
-      renderer.setColor('#4CAF50', '#222')
-      renderer.drawCircle(lx - 1, ly - 1)
-      renderer.setColor(null, '#222')
 
       // 縦線の描画
+      renderer.setColor(null, '#222')
       renderer.beginPath()
       for (let i = 0; i < bondH.length; i++) {
         if (bondH[i]) {
@@ -264,6 +269,8 @@ export default {
         renderer.drawLine(x1, y1, x2, y2)
       }
       renderer.stroke()
+      this.renderPlayer()
+      this.renderGoal()
     }, 300)
   }
 }
@@ -273,15 +280,14 @@ export default {
 <style scoped>
   .maze {
     position: absolute;
-    width: 100%;
-    height: 100%;
+    width: 98%;
+    height: 98%;
     min-height: 50px;
     min-width: 50px;
     overflow: hidden;
   }
   canvas {
     position: absolute;
-    top: 0;
-    right: 0;
+    margin: auto;
   }
 </style>
