@@ -8,6 +8,9 @@ module.exports = {
     publicPath: '/dist/',
     filename: 'build.js'
   },
+  watchOptions: {
+    poll: true
+  },
   module: {
     rules: [
       {
@@ -29,6 +32,7 @@ module.exports = {
         loader: 'ts-loader',
         exclude: /node_modules/,
         options: {
+          configFile: 'tsconfig.json',
           appendTsSuffixTo: [/\.vue$/],
         }
       },
