@@ -1,6 +1,7 @@
 <template>
   <div class="maze">
     <canvas ref="mazeCanvas" :width="width" :height="height"></canvas>
+    <canvas ref="effectCanvas" :style="effectStyle" :width="width" :height="height"></canvas>
     <canvas ref="playerCanvas"
     @touchmove="onTouchMove"
     @mousemove="onMouseMove"
@@ -45,13 +46,14 @@ class Renderer {
     this.ctx.drawImage(image, cx, cy)
   }
 
-  drawCircle (x, y) {
+  drawCircle (x, y, r) {
     this.ctx.beginPath()
     const cx = x * this.unitWidth + this.unitWidth / 2 + this.offset
     const cy = y * this.unitHeight + this.unitHeight / 2 + this.offset
-    const r = Math.min(this.unitWidth, this.unitHeight) / 2 - this.wallWidth
+    r = r != null ? r : Math.min(this.unitWidth, this.unitHeight) / 2 - this.wallWidth
     this.ctx.arc(cx, cy, r, 0, 2 * Math.PI)
     this.ctx.fill()
+    this.ctx.stroke()
   }
 
   drawLine (x1, y1, x2, y2) {
@@ -98,6 +100,19 @@ export default {
     },
     player () {
       return this.$store.state.player
+    },
+    isFinished () {
+      return this.$store.state.isFinished
+    },
+    effectStyle () {
+      if (this.$store.state.isFinished) {
+        return {
+          display: 'inline'
+        }
+      }
+      return {
+        display: 'none'
+      }
     }
   },
   mounted (vm) {
@@ -150,11 +165,16 @@ export default {
     },
     'player.y' () {
       this.renderPlayer()
+    },
+    isFinished () {
+      if (this.isFinished) {
+        this.renderConguraturations()
+        setTimeout(this.updateMaze, 300)
+      }
     }
   },
   methods: {
     onTouchMove (event) {
-      console.log('mousemove')
       event.stopPropagation()
       event.preventDefault()
 
@@ -175,10 +195,9 @@ export default {
       const x = Math.floor((offsetX - this.margin) / this.cellWidth)
       const y = Math.floor((offsetY - this.margin) / this.cellHeight)
       console.log(`(${x}, ${y})`)
-      const dx = this.player.x - x
-      const dy = this.player.y - y
-      if (Math.abs(dx * dy) <= 1) {
-        console.log()
+      const dx = x - this.player.x
+      const dy = y - this.player.y
+      if (Math.abs(dx) <= 1 && Math.abs(dy) <= 1) {
         this.moveBy(dx, dy)
       }
     },
@@ -237,9 +256,22 @@ export default {
       renderer.setColor('#4CAF50', '#222')
       renderer.drawCircle(this.goal.x, this.goal.y)
     },
+    renderConguraturations () {
+      this.effectRenderer = new Renderer(
+        this.$refs.effectCanvas.getContext('2d'),
+        this.cellWidth,
+        this.cellHeight,
+        this.margin
+      )
+      this.effectRenderer.setColor('rgba(192, 80, 77, 0.2)', '#FF0000')
+      this.effectRenderer.drawCircle(this.player.x, this.player.y, 50)
+      setTimeout(function(){
+        this.effectRenderer.clear(this.width, this.height)
+      }.bind(this), 300)
+    },
     // TODO: make more declarative
-    renderMaze: _.debounce(function () {
-      const {renderer, lx, ly, bondH, bondV} = this
+    renderMaze: _.debounce(function() {
+      const { renderer, lx, ly, bondH, bondV } = this
 
       renderer.clear(this.width, this.height)
 
@@ -278,16 +310,17 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  .maze {
-    position: absolute;
-    width: 98%;
-    height: 98%;
-    min-height: 50px;
-    min-width: 50px;
-    overflow: hidden;
-  }
-  canvas {
-    position: absolute;
-    margin: auto;
-  }
+.maze {
+  position: absolute;
+  width: 95%;
+  height: 95%;
+  min-height: 50px;
+  min-width: 50px;
+  overflow: hidden;
+}
+
+canvas {
+  position: absolute;
+  margin: auto;
+}
 </style>

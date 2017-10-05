@@ -26,7 +26,8 @@ const store = new Vuex.Store({
       id: '00',
       x: 0,
       y: 0
-    }
+    },
+    isFinished: false
   },
   getters: {
     getBondH: state => () => {
@@ -38,6 +39,7 @@ const store = new Vuex.Store({
   },
   actions: {
     async movePlayerBy (arg, payload) {
+      console.log(`moveBy: ${payload.dx}, ${payload.dy}`)
       const param = { x: this.state.player.x + payload.dx, y: this.state.player.y + payload.dy }
       await this.dispatch('movePlayerTo', param)
     },
@@ -45,27 +47,25 @@ const store = new Vuex.Store({
       const id = payload.id
       const toX = payload.x
       const toY = payload.y
+      console.log(`moveTo: ${toX}, ${toY}`)
 
       const fromX = this.state.player.x
       const fromY = this.state.player.y
       const bondH = this.getters.getBondH()
       const bondV = this.getters.getBondV()
 
+      if (toX < 0 || toX >= this.state.lx || toY < 0 || toY >= this.state.ly) {
+        return
+      }
       for (let i = Math.min(fromX, toX); i < Math.max(fromX, toX); i++) {
         // 例： from(0, 0) to(1, 0)
         let idx = ((this.state.lx + 1) * fromY) + i + 1
-
-        console.debug(`scanningX: (${i}, ${fromY}) to (${i + 1}, ${fromY})`)
-        console.debug(`${idx}=>${bondH[idx]}`)
         if (!bondH[idx]) {
           return
         }
       }
       for (let j = Math.min(fromY, toY); j < Math.max(fromY, toY); j++) {
         let idx = (this.state.lx * (j + 1) + fromX)
-
-        console.debug(`scanningY: (${fromX}, ${j}) to (${fromX}, ${j + 1})`)
-        console.debug(`${idx}=>${bondV[idx]}`)
         if (!bondV[idx]) {
           return
         }
@@ -96,10 +96,15 @@ const store = new Vuex.Store({
       }
       state.maze.goal.x = payload.maze.goal.x
       state.maze.goal.y = payload.maze.goal.y
+      state.isFinished = false
     },
     setPlayer (state, payload) {
       state.player.x = payload.x
       state.player.y = payload.y
+      if (state.player.x === state.maze.goal.x &&
+        state.player.y === state.maze.goal.y) {
+        state.isFinished = true
+      }
     }
   }
 })
