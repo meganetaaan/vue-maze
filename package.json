@@ -21,8 +21,7 @@
   "homepage": "https://github.com/meganetaaan/vue-maze#readme",
   "dependencies": {
     "lodash": "^4.17.4",
-    "vue": "^2.4.4",
-    "vuex": "^2.4.1"
+    "vue": "^2.4.4"
   },
   "devDependencies": {
     "css-loader": "^0.28.7",
