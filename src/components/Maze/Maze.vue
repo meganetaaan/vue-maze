@@ -307,17 +307,16 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .maze {
-  position: absolute;
-  width: 95%;
-  height: 95%;
-  margin: auto;
-  min-height: 50px;
-  min-width: 50px;
+  position: relative;
+  min-height: 60px;
+  min-width: 60px;
   overflow: hidden;
 }
 
 canvas {
   position: absolute;
+  top: 0;
+  left: 0;
   margin: auto;
 }
 </style>
