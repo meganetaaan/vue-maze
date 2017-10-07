@@ -7,10 +7,10 @@
 </template>
 
 <script>
-import imagePath from './tori.png'
 import _ from 'lodash'
-import Maze from './getMaze'
 import Vue from 'vue'
+import Maze from './getMaze'
+import imagePath from './tori.png'
 import Renderer from './Renderer'
 
 export default {
