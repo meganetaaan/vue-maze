@@ -2,7 +2,6 @@
 
 import Vue from 'vue'
 import Maze from './components/Maze/Maze.vue'
-import store from './components/Maze/store.js'
 
 let v = new Vue({
   el: '#app',
@@ -15,6 +14,5 @@ let v = new Vue({
   },
   components: {
     Maze
-  },
-  store
+  }
 })

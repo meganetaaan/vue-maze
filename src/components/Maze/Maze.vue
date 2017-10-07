@@ -2,19 +2,19 @@
   <div class="maze">
     <canvas ref="mazeCanvas" :width="width" :height="height"></canvas>
     <canvas ref="effectCanvas" :style="effectStyle" :width="width" :height="height"></canvas>
-    <canvas ref="playerCanvas"
-    @touchmove="onTouchMove"
-    @mousemove="onMouseMove"
-    :width="width" :height="height"></canvas>
+    <canvas ref="playerCanvas" @touchmove="onTouchMove" @mousemove="onMouseMove" :width="width" :height="height"></canvas>
   </div>
 </template>
 
 <script>
 import imagePath from './tori.png'
 import _ from 'lodash'
+import Maze from './getMaze'
+import Vue from 'vue'
+let seed = Date.now()
 
 class Renderer {
-  constructor (ctx, unitWidth, unitHeight, offset) {
+  constructor(ctx, unitWidth, unitHeight, offset) {
     this.ctx = ctx
     this.unitWidth = unitWidth
     this.unitHeight = unitHeight
@@ -23,30 +23,35 @@ class Renderer {
   }
 
   // TODO: 境界を見直す
-  clear (w, h) {
+  clear(w, h) {
     this.ctx.clearRect(0, 0, w, h)
   }
 
-  setColor (fill, stroke) {
+  setColor(fill, stroke) {
     this.ctx.fillStyle = fill
     this.ctx.strokeStyle = stroke
   }
 
-  beginPath () {
+  beginPath() {
     this.ctx.beginPath()
   }
 
-  stroke () {
+  stroke() {
     this.ctx.stroke()
   }
 
-  drawImage (x, y, image) {
-    const cx = x * this.unitWidth + this.offset
-    const cy = y * this.unitHeight + this.offset
+  drawImage(x, y, image) {
+    const scaleX = this.unitWidth / image.width
+    const scaleY =  this.unitHeight / image.height
+    const cx = x * this.unitWidth / scaleX + this.offset
+    const cy = y * this.unitHeight / scaleY + this.offset
+    this.ctx.save()
+    this.ctx.scale(scaleX, scaleY)
     this.ctx.drawImage(image, cx, cy)
+    this.ctx.restore()
   }
 
-  drawCircle (x, y, r) {
+  drawCircle(x, y, r) {
     this.ctx.beginPath()
     const cx = x * this.unitWidth + this.unitWidth / 2 + this.offset
     const cy = y * this.unitHeight + this.unitHeight / 2 + this.offset
@@ -56,7 +61,7 @@ class Renderer {
     this.ctx.stroke()
   }
 
-  drawLine (x1, y1, x2, y2) {
+  drawLine(x1, y1, x2, y2) {
     const fromX = this.offset + x1 * this.unitWidth
     const fromY = this.offset + y1 * this.unitHeight
     const toX = this.offset + x2 * this.unitWidth
@@ -64,48 +69,50 @@ class Renderer {
     this.ctx.moveTo(fromX, fromY)
     this.ctx.lineTo(toX, toY)
   }
+
+  drawText(text, x, y) {
+    const left = x * this.unitWidth + this.offset
+    const top = y * this.unitHeight + this.offset
+    this.ctx.fillStyle = 'black'
+    this.ctx.fillText(text, left, top)
+  }
 }
 
 export default {
   name: 'maze',
-  data () {
+  data() {
     return {
-      renderer: null,
       width: null,
       height: null,
       cellWidth: 20,
       cellHeight: 20,
       margin: 5,
-      image: null
+      image: null,
+      maze: {
+        bondH: [],
+        bondV: [],
+        goal: {
+          x: null,
+          y: null
+        }
+      },
+      player: {
+        id: '00',
+        x: 0,
+        y: 0
+      },
+      isFinished: false
     }
   },
   computed: {
-    ready () {
-      return this.bondH.length > 0 || this.bondV.length > 0
-    },
-    lx () {
+    lx() {
       return Math.max(1, Math.floor((this.width - this.margin * 2) / this.cellWidth))
     },
-    ly () {
+    ly() {
       return Math.max(1, Math.floor((this.height - this.margin * 2) / this.cellHeight))
     },
-    bondH () {
-      return this.$store.getters.getBondH()
-    },
-    bondV () {
-      return this.$store.getters.getBondV()
-    },
-    goal () {
-      return this.$store.state.maze.goal
-    },
-    player () {
-      return this.$store.state.player
-    },
-    isFinished () {
-      return this.$store.state.isFinished
-    },
-    effectStyle () {
-      if (this.$store.state.isFinished) {
+    effectStyle() {
+      if (this.isFinished) {
         return {
           display: 'inline'
         }
@@ -115,7 +122,7 @@ export default {
       }
     }
   },
-  mounted (vm) {
+  mounted(vm) {
     this.height = this.$el.offsetHeight - this.margin
     this.width = this.$el.offsetWidth - this.margin
     this.renderer = new Renderer(
@@ -145,31 +152,31 @@ export default {
     })
   },
   watch: {
+    height () {
+      this.renderMaze()
+    },
+    width () {
+      this.renderMaze()
+    },
     lx () {
-      this.updateMaze()
+      this.resetMaze()
     },
     ly () {
-      this.updateMaze()
+      this.resetMaze()
     },
-    bondH () {
+    maze () {
       this.renderMaze()
     },
-    bondV () {
-      this.renderMaze()
+    player () {
+      this.renderPlayer()
     },
     image () {
-      this.renderPlayer()
-    },
-    'player.x' () {
-      this.renderPlayer()
-    },
-    'player.y' () {
       this.renderPlayer()
     },
     isFinished () {
       if (this.isFinished) {
         this.renderConguraturations()
-        setTimeout(this.updateMaze, 300)
+        setTimeout(this.resetMaze, 800)
       }
     }
   },
@@ -229,18 +236,53 @@ export default {
       this.moveBy(1, 0)
     },
     moveBy (dx, dy) {
-      this.$store.dispatch('movePlayerBy', {dx, dy})
+      const x = this.player.x + dx
+      const y = this.player.y + dy
+      this.moveTo(x, y)
     },
-    updateMaze: _.debounce(function () {
-      if (this.lx > 0 && this.ly > 0) {
-        this.$store.dispatch('update', {
-          lx: this.lx,
-          ly: this.ly
-        })
+    moveTo (toX, toY) {
+      console.log(`moveTo: ${toX}, ${toY}`)
+
+      const fromX = this.player.x
+      const fromY = this.player.y
+      const bondH = this.maze.bondH
+      const bondV = this.maze.bondV
+
+      // Check if player can move
+      if (toX < 0 || toX >= this.lx || toY < 0 || toY >= this.ly) {
+        return
       }
-    }, 300),
+      for (let i = Math.min(fromX, toX); i < Math.max(fromX, toX); i++) {
+        // 例： from(0, 0) to(1, 0)
+        let idx = ((this.lx + 1) * fromY) + i + 1
+        if (!bondH[idx]) {
+          return
+        }
+      }
+      for (let j = Math.min(fromY, toY); j < Math.max(fromY, toY); j++) {
+        let idx = (this.lx * (j + 1) + fromX)
+        if (!bondV[idx]) {
+          return
+        }
+      }
+      Vue.set(this, 'player', { x: toX, y: toY })
+      if (toX === this.maze.goal.x &&
+        toY === this.maze.goal.y) {
+        this.isFinished = true
+      }
+    },
+    resetMaze () {
+      const lx = this.lx
+      const ly = this.ly
+      if (lx > 0 && ly > 0) {
+        const maze = new Maze(lx, ly, seed++)
+        Vue.set(this, 'maze', maze)
+        Vue.set(this, 'player', { x: 0, y: 0 })
+        this.isFinished = false
+      }
+    },
     renderPlayer () {
-      const {playerRenderer, player} = this
+      const { playerRenderer, player } = this
       playerRenderer.clear(this.width, this.height)
       playerRenderer.ctx = this.$refs.playerCanvas.getContext('2d')
       playerRenderer.setColor('#FF9800', '#222')
@@ -251,10 +293,11 @@ export default {
       }
     },
     renderGoal () {
-      const {renderer} = this
+      const { renderer, maze } = this
+      const goal = maze.goal
       renderer.ctx = this.$refs.mazeCanvas.getContext('2d')
       renderer.setColor('#4CAF50', '#222')
-      renderer.drawCircle(this.goal.x, this.goal.y)
+      renderer.drawCircle(goal.x, goal.y)
     },
     renderConguraturations () {
       this.effectRenderer = new Renderer(
@@ -263,47 +306,63 @@ export default {
         this.cellHeight,
         this.margin
       )
+      this.effectRenderer.clear(this.width, this.height)
+      // TODO: data
+      const texts = [
+        'BooYah!',
+        'Wow!',
+        'I did it!',
+        'Woohoo!'
+      ]
+      const text = texts[Math.floor(texts.length * Math.random())]
+      this.effectRenderer.drawText(text, this.player.x, this.player.y)
+      /*
       this.effectRenderer.setColor('rgba(192, 80, 77, 0.2)', '#FF0000')
       this.effectRenderer.drawCircle(this.player.x, this.player.y, 50)
-      setTimeout(function(){
+      setTimeout(function() {
         this.effectRenderer.clear(this.width, this.height)
       }.bind(this), 300)
+      */
     },
-    // TODO: make more declarative
-    renderMaze: _.debounce(function() {
-      const { renderer, lx, ly, bondH, bondV } = this
+    renderMaze () {
+      this.$nextTick(() => {
+        const { renderer, lx, ly, maze } = this
+        const bondH = maze.bondH
+        const bondV = maze.bondV
+        console.log(`bondH: ${bondH.length}, bondV: ${bondV.length}`)
 
-      renderer.clear(this.width, this.height)
+        renderer.clear(this.width, this.height)
 
-      // 縦線の描画
-      renderer.setColor(null, '#222')
-      renderer.beginPath()
-      for (let i = 0; i < bondH.length; i++) {
-        if (bondH[i]) {
-          continue
+        // 縦線の描画
+        renderer.setColor(null, '#222')
+        renderer.beginPath()
+        for (let i = 0; i < bondH.length; i++) {
+          if (bondH[i]) {
+            continue
+          }
+          const x1 = i % (lx + 1)
+          const y1 = Math.floor(i / (lx + 1))
+          const x2 = x1
+          const y2 = y1 + 1
+          renderer.drawLine(x1, y1, x2, y2)
         }
-        const x1 = i % (lx + 1)
-        const y1 = Math.floor(i / (lx + 1))
-        const x2 = x1
-        const y2 = y1 + 1
-        renderer.drawLine(x1, y1, x2, y2)
-      }
 
-      // 横線の描画
-      for (let j = 0; j < bondV.length; j++) {
-        if (bondV[j]) {
-          continue
+        // 横線の描画
+        for (let j = 0; j < bondV.length; j++) {
+          if (bondV[j]) {
+            continue
+          }
+          const x1 = j % lx
+          const y1 = Math.floor(j / lx)
+          const x2 = x1 + 1
+          const y2 = y1
+          renderer.drawLine(x1, y1, x2, y2)
         }
-        const x1 = j % lx
-        const y1 = Math.floor(j / lx)
-        const x2 = x1 + 1
-        const y2 = y1
-        renderer.drawLine(x1, y1, x2, y2)
-      }
-      renderer.stroke()
-      this.renderPlayer()
-      this.renderGoal()
-    }, 300)
+        renderer.stroke()
+        this.renderPlayer()
+        this.renderGoal()
+      })
+    }
   }
 }
 </script>
@@ -314,6 +373,7 @@ export default {
   position: absolute;
   width: 95%;
   height: 95%;
+  margin: auto;
   min-height: 50px;
   min-width: 50px;
   overflow: hidden;
