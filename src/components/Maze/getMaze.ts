@@ -99,9 +99,4 @@ class Maze {
   }
 }
 
-function getMaze (lx: number, ly: number, seed: number): Maze {
-  const maze = new Maze(lx, ly, seed)
-  return maze
-}
-
-export default getMaze
+export default Maze
