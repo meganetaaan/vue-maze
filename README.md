@@ -15,8 +15,25 @@ An itty-bitty maze game made as Vue.js component
 
 ![maze-vue-resize](doc/maze-resize.gif)
 
-## data
+## Install
 
-## methods
+```bash
+$ npm install maze vue-maze
+```
 
-## events
+```JavaScript
+import Vue from 'vue'
+import Maze from 'vue-maze'
+
+let v = new Vue({
+  el: '#app',
+  template: `
+    <app>
+        <maze></maze>
+    </app>`,
+  components: {
+    Maze
+  }
+})
+
+```
