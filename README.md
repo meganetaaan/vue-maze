@@ -3,6 +3,8 @@ Vue-maze
 
 An itty-bitty maze game made as Vue.js component
 
+[DEMO](https://meganetaaan.github.io/maze/)
+
 * Generate maze that automatically fit to the component size
 
 ![maze-vue](doc/maze-vue.png)
