@@ -165,6 +165,8 @@ export default {
       })
     },
     onTouchMove (event) {
+      // For preventing "Pull to refresh" feature on Android
+      event.preventDefault()
       const touch = event.touches[0]
       const avatorPos = this.cache.avatorPosition
       const originalPos = this.cache.originalPosition
