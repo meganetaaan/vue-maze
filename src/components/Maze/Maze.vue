@@ -2,7 +2,15 @@
   <div class="maze">
     <canvas ref="mazeCanvas" :width="width" :height="height"></canvas>
     <canvas ref="effectCanvas" :style="effectStyle" :width="width" :height="height"></canvas>
-    <canvas ref="playerCanvas" @touchmove="onTouchMove" @mousemove="onMouseMove" :width="width" :height="height"></canvas>
+    <canvas ref="playerCanvas"
+    :width="width"
+    :height="height"
+    @touchstart="onTouchStart"
+    @touchmove="onTouchMove"
+    @touchend="onTouchEnd"
+    @mousemove="onMouseMove"></canvas>
+    <div v-if="cache" :style="dotStyle">
+    </div>
   </div>
 </template>
 
@@ -17,6 +25,11 @@ export default {
   name: 'maze',
   data () {
     return {
+      cache: null,
+      dotPos: {
+        offsetX: null,
+        offsetY: null
+      },
       width: null,
       height: null,
       cellWidth: 20,
@@ -41,13 +54,13 @@ export default {
     }
   },
   computed: {
-    lx() {
+    lx () {
       return Math.max(1, Math.floor((this.width - this.margin * 2) / this.cellWidth))
     },
-    ly() {
+    ly () {
       return Math.max(1, Math.floor((this.height - this.margin * 2) / this.cellHeight))
     },
-    effectStyle() {
+    effectStyle () {
       if (this.isFinished) {
         return {
           display: 'inline'
@@ -55,6 +68,18 @@ export default {
       }
       return {
         display: 'none'
+      }
+    },
+    dotStyle () {
+      return {
+        position: 'absolute',
+         backgroundColor: 'black',
+         height: '5px',
+         width: '5px',
+         opacity: 0.5,
+         borderRadius: '50%',
+         top: this.dotPos.offsetY + 'px',
+         left: this.dotPos.offsetX + 'px'
       }
     }
   },
@@ -117,17 +142,40 @@ export default {
     }
   },
   methods: {
-    onTouchMove (event) {
-      event.stopPropagation()
-      event.preventDefault()
-
+    onTouchStart (event) {
       const touch = event.touches[0]
-      const rect = touch.target.getBoundingClientRect()
-      const pos = {
-        offsetX: touch.clientX - rect.x,
-        offsetY: touch.clientY - rect.y
-      }
-      this.handleMove(pos)
+      this.cache = {}
+      this.cache.rect =
+      this.cache.avatorPosition =
+      this.cache.originalPosition =
+      Vue.set(this, 'cache', {
+        rect: touch.target.getBoundingClientRect(),
+        avatorPosition: {
+          x: this.player.x * this.cellWidth + this.margin + this.cellWidth / 2,
+          y: this.player.y * this.cellHeight + this.margin + this.cellHeight / 2
+        },
+        originalPosition: {
+          x: touch.clientX,
+          y: touch.clientY
+        },
+        pos: {
+          offsetX: touch.clientX,
+          offsetY: touch.clientY
+        }
+      })
+    },
+    onTouchMove (event) {
+      const touch = event.touches[0]
+      const avatorPos = this.cache.avatorPosition
+      const originalPos = this.cache.originalPosition
+      Vue.set(this, 'dotPos', {
+        offsetX: touch.clientX - originalPos.x + avatorPos.x,
+        offsetY: touch.clientY - originalPos.y + avatorPos.y
+      })
+      this.handleMove(this.dotPos)
+    },
+    onTouchEnd () {
+      this.cache = null
     },
     onMouseMove (event) {
       this.handleMove(event)
