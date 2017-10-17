@@ -15,7 +15,6 @@
 </template>
 
 <script>
-import _ from 'lodash'
 import Vue from 'vue'
 import Maze from './getMaze'
 import imagePath from './tori.png'
