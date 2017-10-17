@@ -185,7 +185,6 @@ export default {
       const offsetY = pos.offsetY
       const x = Math.floor((offsetX - this.margin) / this.cellWidth)
       const y = Math.floor((offsetY - this.margin) / this.cellHeight)
-      console.log(`(${x}, ${y})`)
       const dx = x - this.player.x
       const dy = y - this.player.y
       if (Math.abs(dx) + Math.abs(dy) <= 2) {
@@ -246,8 +245,6 @@ export default {
       return false
     },
     moveTo (toX, toY) {
-      console.log(`moveTo: ${toX}, ${toY}`)
-
       const fromX = this.player.x
       const fromY = this.player.y
       const bondH = this.maze.bondH
@@ -330,7 +327,6 @@ export default {
         const { renderer, lx, ly, maze } = this
         const bondH = maze.bondH
         const bondV = maze.bondV
-        console.log(`bondH: ${bondH.length}, bondV: ${bondV.length}`)
 
         renderer.clear(this.width, this.height)
 
