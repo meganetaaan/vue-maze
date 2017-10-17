@@ -142,6 +142,8 @@ export default {
   },
   methods: {
     onTouchStart (event) {
+      event.preventDefault()
+      event.stopPropagation()
       const touch = event.touches[0]
       this.cache = {}
       this.cache.rect =
@@ -166,6 +168,7 @@ export default {
     onTouchMove (event) {
       // For preventing "Pull to refresh" feature on Android
       event.preventDefault()
+      event.stopPropagation()
       const touch = event.touches[0]
       const avatorPos = this.cache.avatorPosition
       const originalPos = this.cache.originalPosition
@@ -175,7 +178,9 @@ export default {
       })
       this.handleMove(this.dotPos)
     },
-    onTouchEnd () {
+    onTouchEnd (event) {
+      event.preventDefault()
+      event.stopPropagation()
       this.cache = null
     },
     onMouseMove (event) {
