@@ -1,13 +1,23 @@
 // src/index.ts
 
-import Vue from 'vue'
+import Vue, { ComponentOptions } from 'vue'
 import Maze from './components/Maze/Maze.vue'
 
-let v = new Vue({
+// コンポーネントの型を宣言
+interface App extends Vue {
+  startTime: number
+  time: number
+  onStart (): void
+  onFinish (): void
+  onInit (): void
+}
+
+const app = {
   el: '#app',
   template: `
     <app :style="appStyle">
-        <maze :style="mazeStyle"></maze>
+        <div class="time" >{{time}}ms</div>
+        <maze @start="onStart" @finish="onFinish" @init="onInit" :style="mazeStyle"></maze>
     </app>`,
   data: {
     name: 'World',
@@ -20,9 +30,23 @@ let v = new Vue({
     mazeStyle: {
       width: '100%',
       height: '100%'
-    }
+    },
+    startTime: 0,
+    time: 0
   },
   components: {
     Maze
+  },
+  methods: {
+    onStart: function () {
+      this.startTime = Date.now()
+    },
+    onFinish: function () {
+      this.time = Date.now() - this.startTime
+    },
+    onInit: function () {
+      this.startTime = 0
+    }
   }
-})
+} as ComponentOptions<App>
+let v = new Vue(app)

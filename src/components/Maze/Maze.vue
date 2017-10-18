@@ -125,6 +125,7 @@ export default {
       this.resetMaze()
     },
     maze () {
+      this.$emit('init')
       this.renderMaze()
     },
     player () {
@@ -269,9 +270,14 @@ export default {
       }
 
       Vue.set(this, 'player', { x: toX, y: toY })
+      if (!this.isStarted) {
+        this.isStarted = true
+        this.$emit('start')
+      }
       if (toX === this.maze.goal.x &&
-        toY === this.maze.goal.y) {
+        toY === this.maze.goal.y && !this.isFinished) {
         this.isFinished = true
+        this.$emit('finish')
       }
     },
     resetMaze () {
@@ -282,6 +288,7 @@ export default {
         const maze = new Maze(lx, ly, seed)
         Vue.set(this, 'maze', maze)
         Vue.set(this, 'player', { x: 0, y: 0 })
+        this.isStarted = false
         this.isFinished = false
       }
     },
