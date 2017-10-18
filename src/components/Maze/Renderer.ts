@@ -36,8 +36,8 @@ class Renderer {
   drawImage (x: number, y: number, image: ImageBitmap) {
     const scaleX = this.unitWidth / image.width
     const scaleY = this.unitHeight / image.height
-    const cx = x * this.unitWidth / scaleX + this.offset
-    const cy = y * this.unitHeight / scaleY + this.offset
+    const cx = x * this.unitWidth / scaleX + (this.offset / scaleX)
+    const cy = y * this.unitHeight / scaleY + (this.offset / scaleY)
     this.ctx.save()
     this.ctx.scale(scaleX, scaleY)
     this.ctx.drawImage(image, cx, cy)

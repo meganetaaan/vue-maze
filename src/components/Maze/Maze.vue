@@ -31,8 +31,6 @@ export default {
       },
       width: null,
       height: null,
-      cellWidth: 20,
-      cellHeight: 20,
       margin: 5,
       image: null,
       maze: {
@@ -52,7 +50,33 @@ export default {
       seed: Date.now()
     }
   },
+  props: {
+    difficulty: {
+      default: 'normal',
+      type: String
+    }
+  },
   computed: {
+    cellWidth () {
+       switch (this.difficulty) {
+          case 'easy':
+            return 50
+          case 'hard':
+            return 10
+          default:
+            return 20
+       }
+    },
+    cellHeight () {
+       switch (this.difficulty) {
+          case 'easy':
+            return 50
+          case 'hard':
+            return 10
+          default:
+            return 20
+       }
+    },
     lx () {
       return Math.max(1, Math.floor((this.width - this.margin * 2) / this.cellWidth))
     },

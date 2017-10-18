@@ -17,7 +17,7 @@ const app = {
   template: `
     <app :style="appStyle">
         <div class="time" >{{time}}ms</div>
-        <maze @start="onStart" @finish="onFinish" @init="onInit" :style="mazeStyle"></maze>
+        <maze difficulty="easy" @start="onStart" @finish="onFinish" @init="onInit" :style="mazeStyle"></maze>
     </app>`,
   data: {
     name: 'World',

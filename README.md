@@ -20,7 +20,7 @@ An itty-bitty maze game made as Vue.js component
 ## Install
 
 ```bash
-$ npm install maze vue-maze
+$ npm install maze vue-maze --save
 ```
 
 ```JavaScript
@@ -39,3 +39,9 @@ let v = new Vue({
 })
 
 ```
+
+## Props
+
+Props      | Type   | Description                  | Default
+-----------|--------|------------------------------|--------
+difficulty | string | difficulty(easy/normal/hard) | normal
