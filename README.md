@@ -3,19 +3,22 @@ Vue-maze
 
 An itty-bitty maze game made as Vue.js component
 
-[DEMO](https://meganetaaan.github.io/maze/)
-
-* Generate maze that automatically fit to the component size
+[PLAY DEMO](https://meganetaaan.github.io/maze/)
 
 ![maze-vue](doc/maze-vue.png)
 
-* Mousemove/ArrowKey to move the player
+* Fit to the component size automatically
+
+![maze-vue-resize](doc/maze-resize.gif)
+
+* Mousemove/Touchmove/ArrowKey to move the player
 
 ![maze-vue2](doc/maze-vue2.gif)
 
-* Resize component to regenerate the maze
+* Choose difficulty
 
-![maze-vue-resize](doc/maze-resize.gif)
+![maze-vue-resize](doc/maze-difficulty.gif)
+
 
 ## Install
 
