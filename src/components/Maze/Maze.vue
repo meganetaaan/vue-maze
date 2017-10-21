@@ -1,5 +1,5 @@
 <template>
-  <div class="maze">
+  <div class="maze" tabindex="-1" @keyup="onKeyUp">
     <canvas ref="mazeCanvas" :width="width" :height="height"></canvas>
     <canvas ref="effectCanvas" :style="effectStyle" :width="width" :height="height"></canvas>
     <canvas ref="playerCanvas"
@@ -116,8 +116,6 @@ export default {
     })
     image.src = imagePath
 
-    // キーイベントハンドラはグローバルに仕掛ける必要がある。
-    window.addEventListener('keyup', this.onKeyUp)
     window.addEventListener('resize', () => {
       this.height = this.$el.offsetHeight
       this.width = this.$el.offsetWidth
@@ -403,6 +401,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .maze {
+  outline: 0;
   position: relative;
   min-height: 60px;
   min-width: 60px;
