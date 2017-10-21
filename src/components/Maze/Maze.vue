@@ -109,18 +109,6 @@ export default {
   mounted(vm) {
     this.height = this.$el.offsetHeight - this.margin
     this.width = this.$el.offsetWidth - this.margin
-    this.renderer = new Renderer(
-      this.$refs.mazeCanvas.getContext('2d'),
-      this.cellWidth,
-      this.cellHeight,
-      this.margin
-    )
-    this.playerRenderer = new Renderer(
-      this.$refs.playerCanvas.getContext('2d'),
-      this.cellWidth,
-      this.cellHeight,
-      this.margin
-    )
     // アバター画像の読み込み
     const image = new Image()
     image.addEventListener('load', () => {
@@ -317,7 +305,13 @@ export default {
       }
     },
     renderPlayer () {
-      const { playerRenderer, player } = this
+      const playerRenderer = new Renderer(
+        this.$refs.playerCanvas.getContext('2d'),
+        this.cellWidth,
+        this.cellHeight,
+        this.margin
+      )
+      const player = this.player
       playerRenderer.clear(this.width, this.height)
       playerRenderer.ctx = this.$refs.playerCanvas.getContext('2d')
       playerRenderer.setColor('#FF9800', '#222')
@@ -328,20 +322,26 @@ export default {
       }
     },
     renderGoal () {
-      const { renderer, maze } = this
+      const renderer = new Renderer(
+        this.$refs.mazeCanvas.getContext('2d'),
+        this.cellWidth,
+        this.cellHeight,
+        this.margin
+      )
+      const maze = this.maze
       const goal = maze.goal
       renderer.ctx = this.$refs.mazeCanvas.getContext('2d')
       renderer.setColor('#4CAF50', '#222')
       renderer.drawCircle(goal.x, goal.y)
     },
     renderConguraturations () {
-      this.effectRenderer = new Renderer(
+      const effectRenderer = new Renderer(
         this.$refs.effectCanvas.getContext('2d'),
         this.cellWidth,
         this.cellHeight,
         this.margin
       )
-      this.effectRenderer.clear(this.width, this.height)
+      effectRenderer.clear(this.width, this.height)
       // TODO: data
       const texts = [
         'BooYah!',
@@ -350,18 +350,17 @@ export default {
         'Woohoo!'
       ]
       const text = texts[Math.floor(texts.length * Math.random())]
-      this.effectRenderer.drawText(text, this.player.x, this.player.y)
-      /*
-      this.effectRenderer.setColor('rgba(192, 80, 77, 0.2)', '#FF0000')
-      this.effectRenderer.drawCircle(this.player.x, this.player.y, 50)
-      setTimeout(function() {
-        this.effectRenderer.clear(this.width, this.height)
-      }.bind(this), 300)
-      */
+      effectRenderer.drawText(text, this.player.x, this.player.y)
     },
     renderMaze () {
       this.$nextTick(() => {
-        const { renderer, lx, ly, maze } = this
+        const renderer = new Renderer(
+          this.$refs.mazeCanvas.getContext('2d'),
+          this.cellWidth,
+          this.cellHeight,
+          this.margin
+        )
+        const { lx, ly, maze } = this
         const bondH = maze.bondH
         const bondV = maze.bondV
 

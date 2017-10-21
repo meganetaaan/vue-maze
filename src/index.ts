@@ -13,14 +13,19 @@ interface App extends Vue {
 }
 
 const app = {
+  name: 'World',
   el: '#app',
   template: `
     <app :style="appStyle">
-        <div class="time" >{{time}}ms</div>
-        <maze difficulty="easy" @start="onStart" @finish="onFinish" @init="onInit" :style="mazeStyle"></maze>
+      <select v-model="difficulty">
+        <option value="easy">Easy</option>
+        <option value="normal">Normal</option>
+        <option value="hard">Hard</option>
+      </select>
+      <div class="time" >{{time}}ms</div>
+      <maze :difficulty="difficulty" @start="onStart" @finish="onFinish" @init="onInit" :style="mazeStyle"></maze>
     </app>`,
   data: {
-    name: 'World',
     appStyle: {
       position: 'absolute',
       width: '90%',
@@ -32,7 +37,8 @@ const app = {
       height: '100%'
     },
     startTime: 0,
-    time: 0
+    time: 0,
+    difficulty: 'normal'
   },
   components: {
     Maze
