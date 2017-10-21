@@ -40,6 +40,7 @@ class Renderer {
     const cy = y * this.unitHeight / scaleY + (this.offset / scaleY)
     this.ctx.save()
     this.ctx.scale(scaleX, scaleY)
+    this.ctx.imageSmoothingEnabled = false
     this.ctx.drawImage(image, cx, cy)
     this.ctx.restore()
   }
