@@ -169,8 +169,8 @@ export default {
       Vue.set(this, 'cache', {
         rect: touch.target.getBoundingClientRect(),
         avatorPosition: {
-          x: this.player.x * this.cellWidth + this.margin + this.cellWidth / 2,
-          y: this.player.y * this.cellHeight + this.margin + this.cellHeight / 2
+          x: this.player.x * this.cellWidth + this.marginLeft + this.cellWidth / 2,
+          y: this.player.y * this.cellHeight + this.marginTop + this.cellHeight / 2
         },
         originalPosition: {
           x: touch.clientX,
@@ -206,8 +206,8 @@ export default {
     handleMove (pos) {
       const offsetX = pos.offsetX
       const offsetY = pos.offsetY
-      const x = Math.floor((offsetX - this.margin) / this.cellWidth)
-      const y = Math.floor((offsetY - this.margin) / this.cellHeight)
+      const x = Math.floor((offsetX - this.marginLeft) / this.cellWidth)
+      const y = Math.floor((offsetY - this.marginTop) / this.cellHeight)
       const dx = x - this.player.x
       const dy = y - this.player.y
       if (Math.abs(dx) + Math.abs(dy) <= 2) {
