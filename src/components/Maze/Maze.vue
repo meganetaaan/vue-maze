@@ -57,6 +57,12 @@ export default {
     }
   },
   computed: {
+    marginTop () {
+      return (this.height - this.ly * this.cellHeight) / 2
+    },
+    marginLeft () {
+      return (this.width - this.lx * this.cellWidth) / 2
+    },
     cellWidth () {
        switch (this.difficulty) {
           case 'easy':
@@ -307,7 +313,8 @@ export default {
         this.$refs.playerCanvas.getContext('2d'),
         this.cellWidth,
         this.cellHeight,
-        this.margin
+        this.marginLeft,
+        this.marginTop
       )
       const player = this.player
       playerRenderer.clear(this.width, this.height)
@@ -324,7 +331,8 @@ export default {
         this.$refs.mazeCanvas.getContext('2d'),
         this.cellWidth,
         this.cellHeight,
-        this.margin
+        this.marginLeft,
+        this.marginTop
       )
       const maze = this.maze
       const goal = maze.goal
@@ -337,7 +345,8 @@ export default {
         this.$refs.effectCanvas.getContext('2d'),
         this.cellWidth,
         this.cellHeight,
-        this.margin
+        this.marginLeft,
+        this.marginTop
       )
       effectRenderer.clear(this.width, this.height)
       // TODO: data
@@ -356,7 +365,8 @@ export default {
           this.$refs.mazeCanvas.getContext('2d'),
           this.cellWidth,
           this.cellHeight,
-          this.margin
+          this.marginLeft,
+          this.marginTop
         )
         const { lx, ly, maze } = this
         const bondH = maze.bondH

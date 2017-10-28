@@ -2,16 +2,19 @@ class Renderer {
   ctx: CanvasRenderingContext2D
   unitWidth: number
   unitHeight: number
-  offset: number
+  offsetLeft: number
+  offsetTop: number
   wallWidth: number
   constructor (ctx: CanvasRenderingContext2D,
     unitWidth: number,
     unitHeight: number,
-    offset: number) {
+    offsetLeft: number,
+    offsetTop: number) {
     this.ctx = ctx
     this.unitWidth = unitWidth
     this.unitHeight = unitHeight
-    this.offset = offset
+    this.offsetLeft = offsetLeft
+    this.offsetTop = offsetTop
     this.wallWidth = 2
   }
 
@@ -36,8 +39,8 @@ class Renderer {
   drawImage (x: number, y: number, image: ImageBitmap) {
     const scaleX = this.unitWidth / image.width
     const scaleY = this.unitHeight / image.height
-    const cx = x * this.unitWidth / scaleX + (this.offset / scaleX)
-    const cy = y * this.unitHeight / scaleY + (this.offset / scaleY)
+    const cx = x * this.unitWidth / scaleX + (this.offsetLeft / scaleX)
+    const cy = y * this.unitHeight / scaleY + (this.offsetTop / scaleY)
     this.ctx.save()
     this.ctx.scale(scaleX, scaleY)
     this.ctx.imageSmoothingEnabled = false
@@ -47,8 +50,8 @@ class Renderer {
 
   drawCircle (x: number, y: number, r: number) {
     this.ctx.beginPath()
-    const cx = x * this.unitWidth + this.unitWidth / 2 + this.offset;
-    const cy = y * this.unitHeight + this.unitHeight / 2 + this.offset
+    const cx = x * this.unitWidth + this.unitWidth / 2 + this.offsetLeft
+    const cy = y * this.unitHeight + this.unitHeight / 2 + this.offsetTop
     r =
       r != null
         ? r
@@ -59,17 +62,17 @@ class Renderer {
   }
 
   drawLine (x1: number, y1: number, x2: number, y2: number) {
-    const fromX = this.offset + x1 * this.unitWidth
-    const fromY = this.offset + y1 * this.unitHeight
-    const toX = this.offset + x2 * this.unitWidth
-    const toY = this.offset + y2 * this.unitHeight
+    const fromX = this.offsetLeft + x1 * this.unitWidth
+    const fromY = this.offsetTop + y1 * this.unitHeight
+    const toX = this.offsetLeft + x2 * this.unitWidth
+    const toY = this.offsetTop + y2 * this.unitHeight
     this.ctx.moveTo(fromX, fromY)
     this.ctx.lineTo(toX, toY)
   }
 
   drawText (text: string, x: number, y: number) {
-    const left = x * this.unitWidth + this.offset
-    const top = y * this.unitHeight + this.offset
+    const left = x * this.unitWidth + this.offsetLeft
+    const top = y * this.unitHeight + this.offsetTop
     this.ctx.fillStyle = 'black'
     this.ctx.fillText(text, left, top)
   }
