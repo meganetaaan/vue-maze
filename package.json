@@ -1,6 +1,6 @@
 {
   "name": "vue-maze",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "A Vue.js component of a simple maze game",
   "main": "dist/vue-maze.js",
   "scripts": {
@@ -13,7 +13,7 @@
     "type": "git",
     "url": "git+ssh://git@github.com/meganetaaan/vue-maze.git"
   },
-  "keywords": [],
+  "keywords": ["vue", "game", "component"],
   "author": "Shinya Ishikawa",
   "license": "MIT",
   "bugs": {
