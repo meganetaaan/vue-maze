@@ -48,3 +48,11 @@ let v = new Vue({
 Props      | Type   | Description                  | Default
 -----------|--------|------------------------------|--------
 difficulty | string | difficulty(easy/normal/hard) | normal
+
+## Events
+
+Event    | Payload | Description
+---------|---------|------------------------------------
+init     | none    | the maze is initialized
+start    | none    | the player starts to move
+finish   | none    | the player has arrived at the goal
