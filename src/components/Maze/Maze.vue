@@ -54,7 +54,11 @@ export default {
     difficulty: {
       default: 'normal',
       type: String
-    }
+    },
+    imagePath: {
+      default: imagePath,
+      type: String
+    },
   },
   computed: {
     marginTop () {
@@ -120,7 +124,7 @@ export default {
     image.addEventListener('load', () => {
       this.image = image
     })
-    image.src = imagePath
+    image.src = this.imagePath
 
     window.addEventListener('resize', () => {
       this.height = this.$el.offsetHeight

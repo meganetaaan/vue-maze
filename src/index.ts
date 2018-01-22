@@ -1,5 +1,4 @@
 // src/index.ts
-
 import Vue, { ComponentOptions } from 'vue'
 import Maze from './components/Maze/Maze.vue'
 
