@@ -19,6 +19,9 @@ An itty-bitty maze game made as Vue.js component
 
 ![maze-vue-resize](doc/maze-difficulty.gif)
 
+* Use your own avator image
+
+![maze-vue-image](doc/maze-image.gif)
 
 ## Install
 
@@ -46,8 +49,9 @@ let v = new Vue({
 ## Props
 
 Props      | Type   | Description                  | Default
------------|--------|------------------------------|--------
+-----------|--------|------------------------------|--------------------------------
 difficulty | string | difficulty(easy/normal/hard) | normal
+image-path | string | the src path to avator image | (a data url of default image)
 
 ## Events
 
