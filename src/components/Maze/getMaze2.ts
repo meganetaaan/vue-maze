@@ -12,8 +12,6 @@ class Maze {
   bondH: Array<boolean>
   bondV: Array<boolean>
   isOpenArr: Array<boolean>
-  point: Array<number>
-  stack: Array<number>
   goal: {x: number, y: number}
 
   constructor (lx: number, ly: number, seed: number) {
@@ -29,48 +27,52 @@ class Maze {
     for (let i = 0; i < bondV.length; i++) {
       bondV[i] = false
     }
-    const point = new Array(pointSize)
-    for (let i = 0; i < point.length; i++) {
-      point[i] = i
+    const isOpenArr = new Array(pointSize)
+    for (let i = 0; i < pointSize; i++) {
+      isOpenArr[i] = false
     }
 
     this.lx = lx
     this.ly = ly
     this.bondH = bondH
     this.bondV = bondV
-    this.point = point
-    this.stack = []
+    this.isOpenArr = isOpenArr
 
     this.makeMaze()
+    this.goal = {
+      x: this.lx - 1,
+      y: this.ly - 1
+    }
   }
 
   makeMaze (): void {
     // 座標の配列を用意
     const cells: Array<number> = []
-    for (let p of this.point) {
-      this.stack.push(p)
-    }
-
-    // ランダムに並べ替え
-    this.shuffle(cells)
+    cells.push(Math.floor(Math.random() * this.isOpenArr.length))
 
     // 既存の通路以外で穴を掘る方向をランダムに選択してスタックにプッシュ
     while (cells.length > 0) {
+      // debugger
       const c = cells.pop()
       if (c == null) {
         break
       }
       const ix = c % this.lx
-      const iy = c / this.lx
+      const iy = Math.floor(c / this.lx)
+      this.isOpenArr[c] = true
       const direction = this.getDirectionCandidate(ix, iy)
       if (this.isDeadEnd(direction)) {
         continue
       }
-      this.dig(ix, iy, this.getRandomDirection(direction))
+      cells.push(c)
+      const dest = this.getNeighbor(ix, iy, this.getRandomDirection(direction))
+      cells.push(dest.iy * this.lx + dest.ix)
     }
 
     // 行き止まりの場合スタックからランダムに選ぶ
-    // スタックが無くなったら探索完了
+    // スタックが無くなったらスタート、ゴールを開けて探索完了
+    this.bondH[0] = true
+    this.bondH[(this.lx + 1) * this.ly - 1] = true
     return
   }
 
@@ -82,14 +84,15 @@ class Maze {
     direction.east === 0
   }
 
+  private isOpen = (x: number, y: number): boolean => {
+    return this.isOpenArr[y * this.lx + x]
+  }
+
   private getDirectionCandidate (ix: number, iy: number): DirectionCandidate {
-    const isOpen = (x: number, y: number) => {
-      return this.isOpenArr[y * this.lx + x]
-    }
-    const north = iy > 0 && isOpen(ix, iy - 1)
-    const south = iy < this.ly && isOpen(ix, iy + 1)
-    const west = ix > 0 && isOpen(ix - 1, iy)
-    const east = ix < this.lx && isOpen(ix + 1, iy)
+    const north = iy > 0 && !this.isOpen(ix, iy - 1)
+    const south = iy < (this.ly - 1) && !this.isOpen(ix, iy + 1)
+    const west = ix > 0 && !this.isOpen(ix - 1, iy)
+    const east = ix < (this.lx - 1) && !this.isOpen(ix + 1, iy)
     const directionNo = [north, south, west, east].filter(i => i).length
     const probability = directionNo > 0 ? 1.0 / directionNo : 0
     return {
@@ -110,7 +113,7 @@ class Maze {
   }
 
   private getRandomDirection (direction: DirectionCandidate): string {
-    const sum = direction.east + direction.north + direction.west + direction.east
+    const sum = direction.north + direction.south + direction.west + direction.east
     if (sum === 0) {
       throw new Error('No direction available')
     }
@@ -126,76 +129,30 @@ class Maze {
     throw new Error('Something wrong')
   }
 
-  private isSameCluster (ix1: number, iy1: number, ix2: number, iy2: number): boolean {
-    return this.getClusterIndex(ix1, iy1) === this.getClusterIndex(ix2, iy2)
-  }
-
-  private getClusterIndex (x: number, y: number): number {
-    let index = this.lx * y + x
-    while (index !== this.point[index]) {
-      index = this.point[index]
-    }
-    return index
-  }
-
-  private dig (ix: number, iy: number, direction: string) {
+  private getNeighbor (ix: number, iy: number, direction: string) {
     const dest = { ix, iy }
+    // TODO: separate dig method
     switch (direction) {
       case 'north':
         dest.iy -= 1
+        this.bondV[iy * this.lx + ix] = true
         break
       case 'south':
         dest.iy += 1
+        this.bondV[(iy + 1) * this.lx + ix] = true
         break
       case 'east':
         dest.ix += 1
+        this.bondH[iy * (this.lx + 1) + ix + 1] = true
         break
       case 'west':
         dest.ix -= 1
+        this.bondH[iy * (this.lx + 1) + ix] = true
         break
       default:
         throw new Error('Something wrong')
     }
-    this.connect(ix, iy, dest.ix, dest.iy)
-  }
-
-  private connect (ix1: number, iy1: number, ix2: number, iy2: number) {
-    let i1 = this.getClusterIndex(ix1, iy1)
-    let i2 = this.getClusterIndex(ix2, iy2)
-    if (i1 < i2) {
-      this.point[i2] = i1
-    } else {
-      this.point[i1] = i2
-    }
-  }
-
-  private makeMazeSub (rate: number): void {
-    // make path horizontally
-    for (let iy = 0; iy < this.ly; iy++) {
-      for (let ix = 0; ix < this.lx - 1; ix++) {
-        let rand = Math.random()
-        if (rand < rate ||
-          this.getClusterIndex(ix, iy) === this.getClusterIndex(ix + 1, iy)) {
-          continue
-        }
-        this.bondH[this.lx * iy + iy + ix + 1] = true
-        this.connect(ix, iy, ix + 1, iy)
-      }
-    }
-
-    // make path vertically
-    for (let iy = 0; iy < this.ly - 1; iy++) {
-      for (let ix = 0; ix < this.lx; ix++) {
-        let rand = Math.random()
-        if (rand < rate ||
-          this.getClusterIndex(ix, iy) === this.getClusterIndex(ix, iy + 1)) {
-          continue
-        }
-        this.bondV[(iy + 1) * this.lx + ix] = true
-        this.connect(ix, iy, ix, iy + 1)
-      }
-    }
-    return
+    return dest
   }
 }
 
