@@ -15,7 +15,7 @@ const app = {
   name: 'World',
   el: '#app',
   template: `
-    <app :style="appStyle">
+    <div :style="appStyle">
       <select v-model="difficulty">
         <option value="easy">Easy</option>
         <option value="normal">Normal</option>
@@ -23,7 +23,7 @@ const app = {
       </select>
       <div class="time" >{{time}}ms</div>
       <maze :difficulty="difficulty" @start="onStart" @finish="onFinish" @init="onInit" :style="mazeStyle"></maze>
-    </app>`,
+    </div>`,
   data: {
     appStyle: {
       position: 'absolute',

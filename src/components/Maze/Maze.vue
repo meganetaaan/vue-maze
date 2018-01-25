@@ -16,7 +16,7 @@
 
 <script>
 import Vue from 'vue'
-import Maze from './getMaze'
+import Maze from './getMaze2'
 import imagePath from './tori.png'
 import Renderer from './Renderer'
 
