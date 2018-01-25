@@ -1,6 +1,6 @@
 {
   "name": "vue-maze",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "A Vue.js component of a simple maze game",
   "main": "dist/vue-maze.js",
   "scripts": {
