@@ -21,8 +21,12 @@ const app = {
         <option value="normal">Normal</option>
         <option value="hard">Hard</option>
       </select>
+      <select v-model="strategy">
+        <option value="cluster">cluster</option>
+        <option value="dig">dig</option>
+      </select>
       <div class="time" >{{time}}ms</div>
-      <maze :difficulty="difficulty" @start="onStart" @finish="onFinish" @init="onInit" :style="mazeStyle"></maze>
+      <maze :strategy="strategy" :difficulty="difficulty" @start="onStart" @finish="onFinish" @init="onInit" :style="mazeStyle"></maze>
     </div>`,
   data: {
     appStyle: {
@@ -37,7 +41,8 @@ const app = {
     },
     startTime: 0,
     time: 0,
-    difficulty: 'normal'
+    difficulty: 'normal',
+    strategy: 'cluster'
   },
   components: {
     Maze

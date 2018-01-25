@@ -16,9 +16,16 @@
 
 <script>
 import Vue from 'vue'
-import Maze from './getMaze2'
+import Maze from './getMaze'
+import Maze2 from './getMaze2'
 import imagePath from './tori.png'
 import Renderer from './Renderer'
+
+// TODO: select strategy method, not a class
+const strategy = {
+  'dig': Maze2,
+  'cluster': Maze
+}
 
 export default {
   name: 'maze',
@@ -59,6 +66,10 @@ export default {
       default: imagePath,
       type: String
     },
+    strategy: {
+      default: 'cluster',
+      type: String
+    }
   },
   computed: {
     marginTop () {
@@ -153,6 +164,10 @@ export default {
     },
     image () {
       this.renderPlayer()
+    },
+    strategy () {
+      this.$emit('init')
+      this.resetMaze()
     },
     isFinished () {
       if (this.isFinished) {
@@ -305,6 +320,7 @@ export default {
       const ly = this.ly
       const seed = this.seed++
       if (lx > 0 && ly > 0) {
+        const Maze = strategy[this.strategy]
         const maze = new Maze(lx, ly, seed)
         Vue.set(this, 'maze', maze)
         Vue.set(this, 'player', { x: 0, y: 0 })
