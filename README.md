@@ -23,7 +23,7 @@ An itty-bitty maze game made as Vue.js component
 
 ![maze-vue-strategy](doc/maze-strategy.gif)
 
-* Use your own avator image
+* Use your own avator/goal image
 
 ![maze-vue-image](doc/maze-image.gif)
 
