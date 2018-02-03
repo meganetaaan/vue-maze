@@ -57,6 +57,7 @@ Props      | Type   | Description                  | Default
 difficulty | string | difficulty(easy\|normal\|hard) | normal
 strategy | string | maze generating strategy(dig\|cluster) | cluster
 image-path | string | the src path to avator image | (a data url of default image)
+goal-image-path | string | the src path to goal image | (a data url of default image)
 
 ## Events
 
