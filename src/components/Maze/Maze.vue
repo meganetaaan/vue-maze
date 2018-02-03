@@ -1,6 +1,7 @@
 <template>
   <div class="maze" tabindex="-1" @keyup="onKeyUp">
     <canvas ref="mazeCanvas" :width="width" :height="height"></canvas>
+    <canvas ref="goalCanvas" :width="width" :height="height"></canvas>
     <canvas ref="effectCanvas" :style="effectStyle" :width="width" :height="height"></canvas>
     <canvas ref="playerCanvas"
     :width="width"
@@ -19,6 +20,7 @@ import Vue from 'vue'
 import Maze from './getMaze'
 import Maze2 from './getMaze2'
 import imagePath from './tori.png'
+import goalImagePath from './flag.png'
 import Renderer from './Renderer'
 
 // TODO: select strategy method, not a class
@@ -40,6 +42,7 @@ export default {
       height: null,
       margin: 5,
       image: null,
+      goalImage: null,
       maze: {
         bondH: [],
         bondV: [],
@@ -64,6 +67,10 @@ export default {
     },
     imagePath: {
       default: imagePath,
+      type: String
+    },
+    goalImagePath: {
+      default: goalImagePath,
       type: String
     },
     strategy: {
@@ -137,6 +144,12 @@ export default {
     })
     image.src = this.imagePath
 
+    const goalImage = new Image()
+    goalImage.addEventListener('load', () => {
+      this.goalImage = goalImage
+    })
+    goalImage.src = this.goalImagePath
+
     window.addEventListener('resize', () => {
       this.height = this.$el.offsetHeight
       this.width = this.$el.offsetWidth
@@ -164,6 +177,9 @@ export default {
     },
     image () {
       this.renderPlayer()
+    },
+    goalImage () {
+      this.renderGoal()
     },
     strategy () {
       this.$emit('init')
@@ -348,7 +364,7 @@ export default {
     },
     renderGoal () {
       const renderer = new Renderer(
-        this.$refs.mazeCanvas.getContext('2d'),
+        this.$refs.goalCanvas.getContext('2d'),
         this.cellWidth,
         this.cellHeight,
         this.marginLeft,
@@ -356,9 +372,14 @@ export default {
       )
       const maze = this.maze
       const goal = maze.goal
-      renderer.ctx = this.$refs.mazeCanvas.getContext('2d')
+      renderer.ctx = this.$refs.goalCanvas.getContext('2d')
+      renderer.clear(this.width, this.height)
       renderer.setColor('#4CAF50', '#222')
-      renderer.drawCircle(goal.x, goal.y)
+      if (this.goalImage != null) {
+        renderer.drawImage(goal.x, goal.y, this.goalImage)
+      } else {
+        renderer.drawCircle(goal.x, goal.y)
+      }
     },
     renderConguraturations () {
       const effectRenderer = new Renderer(
